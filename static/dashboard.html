@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Trading Analysis Platform</title>
+    <link rel="stylesheet" href="dashboard-styles.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-brand">
+                <h1>Trading Analysis Platform</h1>
+            </div>
+            <div class="nav-menu">
+                <a href="/dashboard" class="nav-link active">Dashboard</a>
+                <a href="/analyzer" class="nav-link">New Analysis</a>
+                <div class="user-menu">
+                    <span id="userFullName" class="user-name"></span>
+                    <button id="logoutBtn" class="btn-logout">Logout</button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <!-- User Stats Section -->
+        <section class="stats-section">
+            <h2>Your Performance</h2>
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
+                        </svg>
+                    </div>
+                    <div class="stat-content">
+                        <div class="stat-value" id="totalAnalyses">0</div>
+                        <div class="stat-label">Total Analyses</div>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon success">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                    </div>
+                    <div class="stat-content">
+                        <div class="stat-value" id="winRate">0%</div>
+                        <div class="stat-label">Win Rate</div>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon warning">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
+                        </svg>
+                    </div>
+                    <div class="stat-content">
+                        <div class="stat-value" id="avgConfidence">0%</div>
+                        <div class="stat-label">Avg Confidence</div>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon info">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                    </div>
+                    <div class="stat-content">
+                        <div class="stat-value" id="analysesLeft">0</div>
+                        <div class="stat-label">Analyses Today</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Quick Actions -->
+        <section class="actions-section">
+            <div class="action-card primary-action" onclick="window.location.href='/analyzer'">
+                <svg class="action-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M12 4v16m8-8H4"></path>
+                </svg>
+                <h3>New Chart Analysis</h3>
+                <p>Upload and analyze a new trading chart</p>
+            </div>
+        </section>
+
+        <!-- Trade History Section -->
+        <section class="history-section">
+            <div class="section-header">
+                <h2>Recent Analyses</h2>
+                <div class="filter-buttons">
+                    <button class="filter-btn active" data-filter="all">All</button>
+                    <button class="filter-btn" data-filter="win">Wins</button>
+                    <button class="filter-btn" data-filter="loss">Losses</button>
+                    <button class="filter-btn" data-filter="pending">Pending</button>
+                </div>
+            </div>
+
+            <div id="historyContainer" class="history-grid">
+                <!-- History items will be loaded here -->
+            </div>
+
+            <div id="loadingHistory" class="loading-indicator" style="display: none;">
+                <div class="spinner"></div>
+                <p>Loading history...</p>
+            </div>
+
+            <div id="noHistory" class="empty-state" style="display: none;">
+                <svg class="empty-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
+                </svg>
+                <h3>No Analyses Yet</h3>
+                <p>Start by analyzing your first trading chart</p>
+                <button class="btn btn-primary" onclick="window.location.href='/analyzer'">Analyze Chart</button>
+            </div>
+        </section>
+
+        <!-- Educational Disclaimer -->
+        <section class="disclaimer-section">
+            <h3>Educational Platform Notice</h3>
+            <p>
+                This platform provides educational analysis only. All trade suggestions are for learning purposes 
+                and should not be considered financial advice. Trading involves significant risk and may not be 
+                suitable for all investors. Always conduct your own research and consult with qualified financial advisors.
+            </p>
+        </section>
+    </div>
+
+    <script src="dashboard-script.js"></script>
+</body>
+</html>

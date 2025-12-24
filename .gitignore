@@ -33,3 +33,7 @@ venv.bak/
 .DS_Store
 uploads/
 *.log
+*.db
+*.sqlite
+*.sqlite3
+trading_system.db
