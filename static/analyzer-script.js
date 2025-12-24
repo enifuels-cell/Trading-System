@@ -92,9 +92,12 @@ async function analyzeChart() {
     loadingIndicator.style.display = 'block';
     analyzeBtn.disabled = true;
     
-    // Prepare form data
+    // Prepare form data with settings
     const formData = new FormData();
     formData.append('chart', selectedFile);
+    formData.append('trading_style', document.getElementById('tradingStyle').value);
+    formData.append('risk_profile', document.getElementById('riskProfile').value);
+    formData.append('asset_type', document.getElementById('assetType').value);
     
     try {
         // Send request to backend

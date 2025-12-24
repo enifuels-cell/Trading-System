@@ -3,17 +3,59 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Trading Chart Analyzer - AI-Powered Analysis</title>
+    <title>Chart Analyzer - Trading Analysis Platform</title>
     <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="dashboard-styles.css">
 </head>
 <body>
-    <div class="container">
-        <header>
-            <h1>Trading Chart Analyzer</h1>
-            <p class="subtitle">AI-Powered Technical Analysis for Educational Purposes</p>
-        </header>
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-brand">
+                <h1>Trading Analysis Platform</h1>
+            </div>
+            <div class="nav-menu">
+                <a href="/dashboard" class="nav-link">Dashboard</a>
+                <a href="/analyzer" class="nav-link active">New Analysis</a>
+                <div class="user-menu">
+                    <span id="userFullName" class="user-name"></span>
+                    <button id="logoutBtn" class="btn-logout">Logout</button>
+                </div>
+            </div>
+        </div>
+    </nav>
 
+    <div class="container">
         <main>
+            <!-- Analysis Settings -->
+            <section class="settings-section">
+                <h2>Analysis Settings</h2>
+                <div class="settings-grid">
+                    <div class="setting-group">
+                        <label for="assetType">Asset Type</label>
+                        <select id="assetType" class="setting-select">
+                            <option value="Crypto">Cryptocurrency</option>
+                            <option value="Forex">Forex</option>
+                            <option value="Stocks">Stocks</option>
+                        </select>
+                    </div>
+                    <div class="setting-group">
+                        <label for="tradingStyle">Trading Style</label>
+                        <select id="tradingStyle" class="setting-select">
+                            <option value="Scalping">Scalping (Minutes to Hours)</option>
+                            <option value="Day Trade" selected>Day Trading (Intraday)</option>
+                            <option value="Swing">Swing Trading (Days to Weeks)</option>
+                        </select>
+                    </div>
+                    <div class="setting-group">
+                        <label for="riskProfile">Risk Profile</label>
+                        <select id="riskProfile" class="setting-select">
+                            <option value="Conservative">Conservative (Lower Risk)</option>
+                            <option value="Balanced" selected>Balanced (Moderate Risk)</option>
+                            <option value="Aggressive">Aggressive (Higher Risk)</option>
+                        </select>
+                    </div>
+                </div>
+            </section>
             <!-- Upload Section -->
             <section class="upload-section">
                 <div class="upload-box" id="uploadBox">
@@ -132,20 +174,49 @@
             <div id="errorMessage" class="error-message" style="display: none;"></div>
         </main>
 
-        <footer>
-            <div class="disclaimer">
-                <h4>Important Disclaimer</h4>
-                <p>
-                    This analysis is provided for <strong>educational purposes only</strong> and should not be considered as financial advice. 
-                    Trading in financial markets carries significant risk and may not be suitable for all investors. 
-                    Past performance is not indicative of future results. Always conduct your own research and consult with 
-                    a qualified financial advisor before making any investment decisions. The creators of this tool are not 
-                    responsible for any financial losses incurred based on this analysis.
-                </p>
-            </div>
+        <footer class="disclaimer-section">
+            <h3>Important Educational Notice</h3>
+            <p>
+                <strong>This analysis is provided for educational purposes only</strong> and should not be considered as financial advice. 
+                Trading in financial markets carries significant risk and may not be suitable for all investors. 
+                Past performance is not indicative of future results. Always conduct your own research and consult with 
+                a qualified financial advisor before making any investment decisions. The creators of this tool are not 
+                responsible for any financial losses incurred based on this analysis.
+            </p>
+            <p style="margin-top: 15px;">
+                <strong>⚠️ Not a Signal Service:</strong> This platform does not provide trading signals or financial advice. 
+                All analyses are automated and for educational purposes only.
+            </p>
         </footer>
     </div>
 
-    <script src="script.js"></script>
+    <script src="analyzer-script.js"></script>
+    <script>
+        // Load user info
+        document.addEventListener('DOMContentLoaded', async () => {
+            try {
+                const response = await fetch('/api/user');
+                const data = await response.json();
+                
+                if (data.success) {
+                    document.getElementById('userFullName').textContent = data.user.full_name;
+                } else {
+                    window.location.href = '/login';
+                }
+            } catch (error) {
+                window.location.href = '/login';
+            }
+            
+            // Logout handler
+            document.getElementById('logoutBtn').addEventListener('click', async () => {
+                try {
+                    await fetch('/api/logout', { method: 'POST' });
+                } catch (error) {
+                    console.error('Logout error:', error);
+                }
+                window.location.href = '/login';
+            });
+        });
+    </script>
 </body>
 </html>

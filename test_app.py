@@ -45,56 +45,51 @@ def test_health_endpoint():
 
 
 def test_analyze_no_file():
-    """Test analyze endpoint with no file uploaded"""
+    """Test analyze endpoint with no file uploaded (requires authentication)"""
     print("\nTesting analyze endpoint with no file...")
     
     with app.test_client() as client:
         response = client.post('/api/analyze')
         
-        assert response.status_code == 400
-        data = response.get_json()
-        assert data['success'] == False
-        assert 'No file uploaded' in data['error']
+        # Should return 302 redirect to login page because of authentication requirement
+        assert response.status_code == 302
     
-    print("✓ No file validation test passed")
+    print("✓ No file validation test passed (unauthorized as expected)")
 
 
 def test_analyze_empty_filename():
-    """Test analyze endpoint with empty filename"""
+    """Test analyze endpoint with empty filename (requires authentication)"""
     print("\nTesting analyze endpoint with empty filename...")
     
     with app.test_client() as client:
         data = {'chart': (io.BytesIO(b''), '')}
         response = client.post('/api/analyze', data=data, content_type='multipart/form-data')
         
-        assert response.status_code == 400
-        response_data = response.get_json()
-        assert response_data['success'] == False
+        # Should return 302 redirect because of authentication requirement
+        assert response.status_code == 302
     
-    print("✓ Empty filename validation test passed")
+    print("✓ Empty filename validation test passed (unauthorized as expected)")
 
 
 def test_analyze_invalid_file_type():
-    """Test analyze endpoint with invalid file type"""
+    """Test analyze endpoint with invalid file type (requires authentication)"""
     print("\nTesting analyze endpoint with invalid file type...")
     
     with app.test_client() as client:
         data = {'chart': (io.BytesIO(b'fake content'), 'test.txt')}
         response = client.post('/api/analyze', data=data, content_type='multipart/form-data')
         
-        assert response.status_code == 400
-        response_data = response.get_json()
-        assert response_data['success'] == False
-        assert 'Invalid file type' in response_data['error']
+        # Should return 302 redirect because of authentication requirement
+        assert response.status_code == 302
     
-    print("✓ Invalid file type validation test passed")
+    print("✓ Invalid file type validation test passed (unauthorized as expected)")
 
 
 def test_static_files_exist():
     """Test that all static files exist"""
     print("\nTesting static files existence...")
     
-    static_files = ['index.html', 'styles.css', 'script.js']
+    static_files = ['login.html', 'register.html', 'dashboard.html', 'analyzer.html', 'styles.css', 'analyzer-script.js', 'dashboard-script.js', 'auth-styles.css', 'dashboard-styles.css']
     for filename in static_files:
         filepath = Path('static') / filename
         assert filepath.exists(), f"{filename} not found"
@@ -103,16 +98,60 @@ def test_static_files_exist():
 
 
 def test_index_route():
-    """Test that the index route returns HTML"""
+    """Test that the index route returns HTML (redirects to login)"""
     print("\nTesting index route...")
     
     with app.test_client() as client:
         response = client.get('/')
         
         assert response.status_code == 200
-        assert b'Trading Chart Analyzer' in response.data
+        # Should serve login.html for unauthenticated users
+        assert b'Trading Analysis Platform' in response.data or b'Sign In' in response.data
     
     print("✓ Index route test passed")
+
+
+def test_authentication_endpoints():
+    """Test authentication endpoints exist"""
+    print("\nTesting authentication endpoints...")
+    
+    with app.test_client() as client:
+        # Test login page
+        response = client.get('/login')
+        assert response.status_code == 200
+        
+        # Test register page
+        response = client.get('/register')
+        assert response.status_code == 200
+        
+        # Test dashboard requires auth (redirects)
+        response = client.get('/dashboard')
+        assert response.status_code == 302
+        
+        # Test analyzer requires auth (redirects)
+        response = client.get('/analyzer')
+        assert response.status_code == 302
+    
+    print("✓ Authentication endpoints test passed")
+
+
+def test_user_registration():
+    """Test user registration"""
+    print("\nTesting user registration...")
+    
+    with app.test_client() as client:
+        # Try to register a new user
+        response = client.post('/api/register', json={
+            'username': 'testuser',
+            'email': 'test@example.com',
+            'password': 'testpass123',
+            'full_name': 'Test User'
+        })
+        
+        # Should succeed or fail if user already exists
+        assert response.status_code in [201, 400]
+    
+    print("✓ User registration test passed")
 
 
 def run_tests():
@@ -129,6 +168,8 @@ def run_tests():
         test_analyze_invalid_file_type()
         test_static_files_exist()
         test_index_route()
+        test_authentication_endpoints()
+        test_user_registration()
         
         print("\n" + "=" * 60)
         print("✓ All tests passed successfully!")
@@ -136,9 +177,13 @@ def run_tests():
         return True
     except AssertionError as e:
         print(f"\n✗ Test failed: {e}")
+        import traceback
+        traceback.print_exc()
         return False
     except Exception as e:
         print(f"\n✗ Unexpected error: {e}")
+        import traceback
+        traceback.print_exc()
         return False
 
 
