@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trading Chart Analyzer - AI-Powered Analysis</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>📈 Trading Chart Analyzer</h1>
+            <p class="subtitle">AI-Powered Technical Analysis for Educational Purposes</p>
+        </header>
+
+        <main>
+            <!-- Upload Section -->
+            <section class="upload-section">
+                <div class="upload-box" id="uploadBox">
+                    <input type="file" id="chartInput" accept="image/*" hidden>
+                    <div class="upload-content">
+                        <svg class="upload-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M17 8l-5-5-5 5M12 3v12"></path>
+                        </svg>
+                        <h3>Upload Trading Chart</h3>
+                        <p>Click to browse or drag and drop</p>
+                        <p class="file-types">Supports: PNG, JPG, JPEG, GIF, WEBP (Max 10MB)</p>
+                    </div>
+                    <img id="previewImage" class="preview-image" style="display: none;" alt="Chart preview">
+                </div>
+                <button id="analyzeBtn" class="btn btn-primary" disabled>Analyze Chart</button>
+            </section>
+
+            <!-- Loading Indicator -->
+            <div id="loadingIndicator" class="loading-indicator" style="display: none;">
+                <div class="spinner"></div>
+                <p>Analyzing your chart... This may take a few moments.</p>
+            </div>
+
+            <!-- Results Section -->
+            <section id="resultsSection" class="results-section" style="display: none;">
+                <h2>Analysis Results</h2>
+                
+                <div class="result-card">
+                    <div class="card-header">
+                        <h3>Market Overview</h3>
+                    </div>
+                    <div class="card-content">
+                        <div class="info-row">
+                            <span class="label">Market Type:</span>
+                            <span id="marketType" class="value"></span>
+                        </div>
+                        <div class="info-row">
+                            <span class="label">Confidence Score:</span>
+                            <span id="confidenceScore" class="value confidence-badge"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="result-card">
+                    <div class="card-header">
+                        <h3>Identified Patterns</h3>
+                    </div>
+                    <div class="card-content">
+                        <div id="patternsList" class="tags-container"></div>
+                    </div>
+                </div>
+
+                <div class="result-card">
+                    <div class="card-header">
+                        <h3>Technical Indicators</h3>
+                    </div>
+                    <div class="card-content">
+                        <div id="indicatorsList" class="tags-container"></div>
+                    </div>
+                </div>
+
+                <div class="result-card trade-setup-card">
+                    <div class="card-header">
+                        <h3>📊 Suggested Trade Setup</h3>
+                    </div>
+                    <div class="card-content">
+                        <div class="trade-direction" id="tradeDirection"></div>
+                        <div class="trade-levels">
+                            <div class="level-item">
+                                <span class="level-label">Entry Point</span>
+                                <span id="entryLevel" class="level-value entry"></span>
+                            </div>
+                            <div class="level-item">
+                                <span class="level-label">Stop Loss</span>
+                                <span id="stopLoss" class="level-value stop"></span>
+                            </div>
+                            <div class="level-item">
+                                <span class="level-label">Take Profit</span>
+                                <div id="takeProfitLevels" class="level-value profit"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="result-card">
+                    <div class="card-header">
+                        <h3>Pattern Explanation</h3>
+                    </div>
+                    <div class="card-content">
+                        <p id="patternExplanation" class="explanation-text"></p>
+                    </div>
+                </div>
+
+                <div class="result-card">
+                    <div class="card-header">
+                        <h3>Trading Reasoning</h3>
+                    </div>
+                    <div class="card-content">
+                        <p id="reasoning" class="explanation-text"></p>
+                    </div>
+                </div>
+
+                <div class="result-card risk-card">
+                    <div class="card-header">
+                        <h3>⚠️ Risk Factors</h3>
+                    </div>
+                    <div class="card-content">
+                        <ul id="riskFactorsList" class="risk-list"></ul>
+                    </div>
+                </div>
+
+                <button id="analyzeAnotherBtn" class="btn btn-secondary">Analyze Another Chart</button>
+            </section>
+
+            <!-- Error Message -->
+            <div id="errorMessage" class="error-message" style="display: none;"></div>
+        </main>
+
+        <footer>
+            <div class="disclaimer">
+                <h4>⚠️ Important Disclaimer</h4>
+                <p>
+                    This analysis is provided for <strong>educational purposes only</strong> and should not be considered as financial advice. 
+                    Trading in financial markets carries significant risk and may not be suitable for all investors. 
+                    Past performance is not indicative of future results. Always conduct your own research and consult with 
+                    a qualified financial advisor before making any investment decisions. The creators of this tool are not 
+                    responsible for any financial losses incurred based on this analysis.
+                </p>
+            </div>
+        </footer>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
