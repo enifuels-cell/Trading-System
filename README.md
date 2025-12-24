@@ -57,12 +57,15 @@ An AI-powered web application that analyzes trading chart screenshots (crypto, f
    
    # Edit .env and add your OpenAI API key
    # OPENAI_API_KEY=your_actual_api_key_here
+   # FLASK_DEBUG=True  # Only for development, set to False for production
    ```
 
 5. **Run the application**
    ```bash
    python app.py
    ```
+   
+   **Note**: By default, debug mode is disabled for security. To enable it during development, set `FLASK_DEBUG=True` in your `.env` file.
 
 6. **Open in browser**
    - Navigate to `http://localhost:5000`
@@ -157,6 +160,8 @@ Trading-System/
 - File size limited to 10MB
 - Only image file types are accepted
 - API keys should be kept secure in `.env` file (never commit to git)
+- **Debug mode is disabled by default** - Only enable `FLASK_DEBUG=True` for local development
+- For production deployment, use a proper WSGI server (e.g., Gunicorn, uWSGI) instead of Flask's built-in server
 
 ## Contributing
 

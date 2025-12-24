@@ -220,12 +220,11 @@ header h1 {
 }
 
 .card-header h3 {
-    font-size: 1.1em;
+    font-size: 0.9em;
     color: var(--text-primary);
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 0.5px;
-    font-size: 0.9em;
 }
 
 .card-content {

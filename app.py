@@ -1,5 +1,6 @@
 import os
 import base64
+import json
 from flask import Flask, request, jsonify, send_from_directory
 from flask_cors import CORS
 from werkzeug.utils import secure_filename
@@ -111,7 +112,6 @@ Format your response as JSON with this structure:
         )
         
         # Parse the response
-        import json
         analysis = json.loads(response.choices[0].message.content)
         
         return {
@@ -195,4 +195,10 @@ if __name__ == '__main__':
         print("WARNING: OPENAI_API_KEY not set in environment variables")
         print("Please create a .env file with your OpenAI API key")
     
-    app.run(debug=True, host='0.0.0.0', port=5000)
+    # Get debug mode from environment (default to False for security)
+    debug_mode = os.getenv('FLASK_DEBUG', 'False').lower() in ('true', '1', 'yes')
+    
+    if debug_mode:
+        print("WARNING: Running in debug mode. This should NOT be used in production!")
+    
+    app.run(debug=debug_mode, host='0.0.0.0', port=5000)
