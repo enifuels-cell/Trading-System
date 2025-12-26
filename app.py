@@ -526,6 +526,9 @@ def analyze_chart():
         if result['success']:
             analysis = result['analysis']
             
+            # Safely extract trade_setup with null checks
+            trade_setup = analysis.get('trade_setup') or {}
+            
             # Save analysis to database
             trade_analysis = TradeAnalysis(
                 user_id=current_user.id,
@@ -535,10 +538,10 @@ def analyze_chart():
                 asset_type=asset_type,
                 patterns=json.dumps(analysis.get('patterns', [])),
                 indicators=json.dumps(analysis.get('indicators', [])),
-                trade_direction=analysis.get('trade_setup', {}).get('direction'),
-                entry_price=analysis.get('trade_setup', {}).get('entry'),
-                stop_loss=analysis.get('trade_setup', {}).get('stop_loss'),
-                take_profit=json.dumps(analysis.get('trade_setup', {}).get('take_profit', [])),
+                trade_direction=trade_setup.get('direction'),
+                entry_price=trade_setup.get('entry'),
+                stop_loss=trade_setup.get('stop_loss'),
+                take_profit=json.dumps(trade_setup.get('take_profit', [])),
                 pattern_explanation=analysis.get('pattern_explanation'),
                 reasoning=analysis.get('reasoning'),
                 confidence_score=analysis.get('confidence_score'),
