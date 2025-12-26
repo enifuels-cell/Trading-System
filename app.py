@@ -43,7 +43,7 @@ app.config['MAX_CONTENT_LENGTH'] = MAX_FILE_SIZE
 Path(UPLOAD_FOLDER).mkdir(exist_ok=True)
 
 # OpenAI API key
-openai.api_key = os.getenv('OPENAI_API_KEY')
+OPENAI_API_KEY = os.getenv('OPENAI_API_KEY')
 
 
 # Database Models
@@ -133,6 +133,13 @@ def analyze_chart_with_ai(image_path, trading_style='Day Trade', risk_profile='B
     Analyze trading chart using OpenAI GPT-4 Vision
     Returns structured analysis with trade setup
     """
+    # Check if API key is configured
+    if not OPENAI_API_KEY or not OPENAI_API_KEY.strip():
+        return {
+            'success': False,
+            'error': 'OpenAI API key is not configured. Please set OPENAI_API_KEY in your .env file.'
+        }
+    
     try:
         # Read and encode the image
         base64_image = encode_image(image_path)
@@ -202,7 +209,7 @@ Format your response as JSON with this structure:
 }}"""
 
         # Call OpenAI API
-        client = openai.OpenAI(api_key=openai.api_key)
+        client = openai.OpenAI(api_key=OPENAI_API_KEY)
         response = client.chat.completions.create(
             model="gpt-4o",
             messages=[
@@ -231,10 +238,30 @@ Format your response as JSON with this structure:
             'analysis': analysis
         }
         
-    except Exception as e:
+    except openai.AuthenticationError:
+        # Handle authentication errors (invalid API key)
         return {
             'success': False,
-            'error': str(e)
+            'error': 'Invalid OpenAI API key. Please check your OPENAI_API_KEY in the .env file and ensure it is correct. You can get a valid API key from https://platform.openai.com/api-keys'
+        }
+    except openai.RateLimitError:
+        # Handle rate limit errors
+        return {
+            'success': False,
+            'error': 'OpenAI API rate limit exceeded. Please try again in a few moments or check your usage at https://platform.openai.com/usage'
+        }
+    except openai.APIError:
+        # Handle general API errors
+        return {
+            'success': False,
+            'error': 'An error occurred while communicating with the OpenAI API. Please try again later or check the service status at https://status.openai.com/'
+        }
+    except Exception as e:
+        # Log the actual error for debugging but return a generic message
+        app.logger.error(f'Unexpected error in analyze_chart_with_ai: {str(e)}', exc_info=True)
+        return {
+            'success': False,
+            'error': 'An unexpected error occurred while analyzing the chart. Please try again or contact support if the issue persists.'
         }
 
 
@@ -619,7 +646,7 @@ if __name__ == '__main__':
         print("Database initialized successfully")
     
     # Check if API key is set
-    if not openai.api_key:
+    if not OPENAI_API_KEY or not OPENAI_API_KEY.strip():
         print("WARNING: OPENAI_API_KEY not set in environment variables")
         print("Please create a .env file with your OpenAI API key")
     

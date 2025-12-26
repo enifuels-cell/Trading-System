@@ -103,6 +103,14 @@ The system will identify patterns such as:
 - Verify your API key is correctly copied (no extra spaces)
 - Ensure the `.env` file is in the project root directory
 
+### Error code: 401 - Incorrect API key
+- This means your OpenAI API key is invalid or incorrectly configured
+- Verify you copied the full API key from https://platform.openai.com/api-keys
+- Make sure there are no extra spaces or quotes around the key in `.env`
+- Ensure your API key starts with `sk-proj-` or `sk-` 
+- Check that your OpenAI account has credits available
+- Try generating a new API key if the issue persists
+
 ### "Failed to connect to the server" error
 - Check if the Flask server is running
 - Verify you're accessing http://localhost:5000
