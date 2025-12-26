@@ -1,6 +1,7 @@
 import os
 import base64
 import json
+import traceback
 from datetime import datetime, timedelta
 from flask import Flask, request, jsonify, send_from_directory, redirect, url_for, session
 from flask_cors import CORS
@@ -134,7 +135,7 @@ def analyze_chart_with_ai(image_path, trading_style='Day Trade', risk_profile='B
     Returns structured analysis with trade setup
     """
     # Check if API key is configured
-    if not OPENAI_API_KEY:
+    if not OPENAI_API_KEY or not OPENAI_API_KEY.strip():
         return {
             'success': False,
             'error': 'OpenAI API key is not configured. Please set OPENAI_API_KEY in your .env file.'
@@ -258,7 +259,6 @@ Format your response as JSON with this structure:
         }
     except Exception as e:
         # Log the actual error for debugging but return a generic message
-        import traceback
         traceback.print_exc()
         return {
             'success': False,
