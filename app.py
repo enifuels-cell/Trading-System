@@ -646,7 +646,7 @@ if __name__ == '__main__':
         print("Database initialized successfully")
     
     # Check if API key is set
-    if not OPENAI_API_KEY:
+    if not OPENAI_API_KEY or not OPENAI_API_KEY.strip():
         print("WARNING: OPENAI_API_KEY not set in environment variables")
         print("Please create a .env file with your OpenAI API key")
     
