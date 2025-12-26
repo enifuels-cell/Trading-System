@@ -1,7 +1,6 @@
 import os
 import base64
 import json
-import traceback
 from datetime import datetime, timedelta
 from flask import Flask, request, jsonify, send_from_directory, redirect, url_for, session
 from flask_cors import CORS
@@ -259,7 +258,7 @@ Format your response as JSON with this structure:
         }
     except Exception as e:
         # Log the actual error for debugging but return a generic message
-        traceback.print_exc()
+        app.logger.error(f'Unexpected error in analyze_chart_with_ai: {str(e)}', exc_info=True)
         return {
             'success': False,
             'error': 'An unexpected error occurred while analyzing the chart. Please try again or contact support if the issue persists.'
