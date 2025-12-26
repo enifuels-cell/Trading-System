@@ -256,6 +256,12 @@ Format your response as JSON with this structure:
             'success': False,
             'error': 'An error occurred while communicating with the OpenAI API. Please try again later or check the service status at https://status.openai.com/'
         }
+    except json.JSONDecodeError:
+        # Handle JSON parsing errors
+        return {
+            'success': False,
+            'error': 'Failed to parse the analysis response. Please try again.'
+        }
     except Exception as e:
         # Log the actual error for debugging but return a generic message
         app.logger.error(f'Unexpected error in analyze_chart_with_ai: {str(e)}', exc_info=True)
@@ -263,6 +269,63 @@ Format your response as JSON with this structure:
             'success': False,
             'error': 'An unexpected error occurred while analyzing the chart. Please try again or contact support if the issue persists.'
         }
+
+
+# Backend API route for OpenAI call
+@app.route('/api/openai-call', methods=['POST'])
+@login_required
+def openai_call():
+    """
+    Backend API route for making OpenAI API calls
+    Expects: JSON with 'prompt' field
+    Returns: JSON with success status and output
+    """
+    data = request.get_json()
+    prompt = data.get('prompt', 'Hello world')
+    
+    if not OPENAI_API_KEY or not OPENAI_API_KEY.strip():
+        return jsonify({
+            'success': False,
+            'error': 'OpenAI API key is not configured. Please set OPENAI_API_KEY in your .env file.'
+        }), 500
+    
+    try:
+        client = openai.OpenAI(api_key=OPENAI_API_KEY)
+        response = client.chat.completions.create(
+            model="gpt-4",
+            messages=[
+                {"role": "user", "content": prompt}
+            ],
+            max_tokens=500
+        )
+        return jsonify({
+            "success": True,
+            "output": response.choices[0].message.content
+        })
+    except openai.AuthenticationError:
+        app.logger.error('OpenAI authentication error in openai_call', exc_info=True)
+        return jsonify({
+            "success": False,
+            "error": "Invalid OpenAI API key. Please check your configuration."
+        }), 401
+    except openai.RateLimitError:
+        app.logger.error('OpenAI rate limit error in openai_call', exc_info=True)
+        return jsonify({
+            "success": False,
+            "error": "OpenAI API rate limit exceeded. Please try again later."
+        }), 429
+    except openai.APIError as e:
+        app.logger.error(f'OpenAI API error in openai_call: {str(e)}', exc_info=True)
+        return jsonify({
+            "success": False,
+            "error": "An error occurred while communicating with the OpenAI API. Please try again later."
+        }), 502
+    except Exception as e:
+        app.logger.error(f'Unexpected error in openai_call: {str(e)}', exc_info=True)
+        return jsonify({
+            "success": False,
+            "error": "An unexpected error occurred. Please try again or contact support if the issue persists."
+        }), 500
 
 
 @app.route('/')
