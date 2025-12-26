@@ -207,55 +207,30 @@ Format your response as JSON with this structure:
   "confidence_score": number,
   "risk_factors": ["array", "of", "risks"]
 }}"""
+    except Exception as e:
+        app.logger.error(f"Error preparing analysis prompt: {str(e)}")
+        return {
+            'success': False,
+            'error': f'Error preparing analysis prompt: {str(e)}'
+        }
 
-        # Call OpenAI API
-        client = openai.OpenAI(api_key=OPENAI_API_KEY)
-        response = client.chat.completions.create(
-            model="gpt-4o",
-            messages=[
-                {
-                    "role": "user",
-                    "content": [
-                        {"type": "text", "text": prompt},
-                        {
-                            "type": "image_url",
-                            "image_url": {
-                                "url": f"data:image/jpeg;base64,{base64_image}"
-                            }
-                        }
-                    ]
-                }
-            ],
-            max_tokens=1500,
-            response_format={"type": "json_object"}
+
+# Backend API route for OpenAI call
+@app.route('/api/openai-call', methods=['POST'])
+@login_required
+def openai_call():
+    data = request.get_json()
+    prompt = data.get('prompt', 'Hello world')
+    try:
+        from openai import OpenAI
+        client = OpenAI(api_key=OPENAI_API_KEY)
+        response = client.responses.create(
+            model="gpt-4.1-mini",
+            input=prompt
         )
-        
-        # Parse the response
-        analysis = json.loads(response.choices[0].message.content)
-        
-        return {
-            'success': True,
-            'analysis': analysis
-        }
-        
-    except openai.AuthenticationError:
-        # Handle authentication errors (invalid API key)
-        return {
-            'success': False,
-            'error': 'Invalid OpenAI API key. Please check your OPENAI_API_KEY in the .env file and ensure it is correct. You can get a valid API key from https://platform.openai.com/api-keys'
-        }
-    except openai.RateLimitError:
-        # Handle rate limit errors
-        return {
-            'success': False,
-            'error': 'OpenAI API rate limit exceeded. Please try again in a few moments or check your usage at https://platform.openai.com/usage'
-        }
-    except openai.APIError:
-        # Handle general API errors
-        return {
-            'success': False,
-            'error': 'An error occurred while communicating with the OpenAI API. Please try again later or check the service status at https://status.openai.com/'
-        }
+        return jsonify({"success": True, "output": response.output_text})
+    except Exception as e:
+        return jsonify({"success": False, "output": None, "error": str(e)})
     except Exception as e:
         # Log the actual error for debugging but return a generic message
         app.logger.error(f'Unexpected error in analyze_chart_with_ai: {str(e)}', exc_info=True)
