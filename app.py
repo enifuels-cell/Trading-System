@@ -250,16 +250,19 @@ Format your response as JSON with this structure:
             'success': False,
             'error': 'OpenAI API rate limit exceeded. Please try again in a few moments or check your usage at https://platform.openai.com/usage'
         }
-    except openai.APIError as e:
+    except openai.APIError:
         # Handle general API errors
         return {
             'success': False,
-            'error': f'OpenAI API error: {str(e)}'
+            'error': 'An error occurred while communicating with the OpenAI API. Please try again later or check the service status at https://status.openai.com/'
         }
     except Exception as e:
+        # Log the actual error for debugging but return a generic message
+        import traceback
+        traceback.print_exc()
         return {
             'success': False,
-            'error': str(e)
+            'error': 'An unexpected error occurred while analyzing the chart. Please try again or contact support if the issue persists.'
         }
 
 
