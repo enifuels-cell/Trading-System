@@ -302,11 +302,29 @@ def openai_call():
             "success": True,
             "output": response.choices[0].message.content
         })
-    except Exception as e:
-        app.logger.error(f'Error in openai_call: {str(e)}', exc_info=True)
+    except openai.AuthenticationError:
+        app.logger.error('OpenAI authentication error in openai_call', exc_info=True)
         return jsonify({
             "success": False,
-            "error": str(e)
+            "error": "Invalid OpenAI API key. Please check your configuration."
+        }), 401
+    except openai.RateLimitError:
+        app.logger.error('OpenAI rate limit error in openai_call', exc_info=True)
+        return jsonify({
+            "success": False,
+            "error": "OpenAI API rate limit exceeded. Please try again later."
+        }), 429
+    except openai.APIError as e:
+        app.logger.error(f'OpenAI API error in openai_call: {str(e)}', exc_info=True)
+        return jsonify({
+            "success": False,
+            "error": "An error occurred while communicating with the OpenAI API. Please try again later."
+        }), 502
+    except Exception as e:
+        app.logger.error(f'Unexpected error in openai_call: {str(e)}', exc_info=True)
+        return jsonify({
+            "success": False,
+            "error": "An unexpected error occurred. Please try again or contact support if the issue persists."
         }), 500
 
 
