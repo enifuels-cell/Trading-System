@@ -43,7 +43,7 @@ app.config['MAX_CONTENT_LENGTH'] = MAX_FILE_SIZE
 Path(UPLOAD_FOLDER).mkdir(exist_ok=True)
 
 # OpenAI API key
-openai.api_key = os.getenv('OPENAI_API_KEY')
+OPENAI_API_KEY = os.getenv('OPENAI_API_KEY')
 
 
 # Database Models
@@ -133,6 +133,13 @@ def analyze_chart_with_ai(image_path, trading_style='Day Trade', risk_profile='B
     Analyze trading chart using OpenAI GPT-4 Vision
     Returns structured analysis with trade setup
     """
+    # Check if API key is configured
+    if not OPENAI_API_KEY:
+        return {
+            'success': False,
+            'error': 'OpenAI API key is not configured. Please set OPENAI_API_KEY in your .env file.'
+        }
+    
     try:
         # Read and encode the image
         base64_image = encode_image(image_path)
@@ -202,7 +209,7 @@ Format your response as JSON with this structure:
 }}"""
 
         # Call OpenAI API
-        client = openai.OpenAI(api_key=openai.api_key)
+        client = openai.OpenAI(api_key=OPENAI_API_KEY)
         response = client.chat.completions.create(
             model="gpt-4o",
             messages=[
@@ -231,6 +238,24 @@ Format your response as JSON with this structure:
             'analysis': analysis
         }
         
+    except openai.AuthenticationError as e:
+        # Handle authentication errors (invalid API key)
+        return {
+            'success': False,
+            'error': 'Invalid OpenAI API key. Please check your OPENAI_API_KEY in the .env file and ensure it is correct. You can get a valid API key from https://platform.openai.com/api-keys'
+        }
+    except openai.RateLimitError as e:
+        # Handle rate limit errors
+        return {
+            'success': False,
+            'error': 'OpenAI API rate limit exceeded. Please try again in a few moments or check your usage at https://platform.openai.com/usage'
+        }
+    except openai.APIError as e:
+        # Handle general API errors
+        return {
+            'success': False,
+            'error': f'OpenAI API error: {str(e)}'
+        }
     except Exception as e:
         return {
             'success': False,
@@ -619,7 +644,7 @@ if __name__ == '__main__':
         print("Database initialized successfully")
     
     # Check if API key is set
-    if not openai.api_key:
+    if not OPENAI_API_KEY:
         print("WARNING: OPENAI_API_KEY not set in environment variables")
         print("Please create a .env file with your OpenAI API key")
     
