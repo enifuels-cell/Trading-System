@@ -238,13 +238,13 @@ Format your response as JSON with this structure:
             'analysis': analysis
         }
         
-    except openai.AuthenticationError as e:
+    except openai.AuthenticationError:
         # Handle authentication errors (invalid API key)
         return {
             'success': False,
             'error': 'Invalid OpenAI API key. Please check your OPENAI_API_KEY in the .env file and ensure it is correct. You can get a valid API key from https://platform.openai.com/api-keys'
         }
-    except openai.RateLimitError as e:
+    except openai.RateLimitError:
         # Handle rate limit errors
         return {
             'success': False,
