@@ -9,6 +9,36 @@ from unittest.mock import patch, MagicMock
 from app import app, db, User
 import io
 
+
+def setup_test_user():
+    """Create a test user for testing"""
+    test_user = User.query.filter_by(username='testuser_null_safety').first()
+    if not test_user:
+        test_user = User(
+            username='testuser_null_safety',
+            email='test_null_safety@example.com',
+            full_name='Test User',
+            is_premium=True  # Make premium to avoid daily limit issues
+        )
+        test_user.set_password('testpass123')
+        db.session.add(test_user)
+        db.session.commit()
+    else:
+        # Ensure user is premium for testing
+        test_user.is_premium = True
+        db.session.commit()
+    return test_user
+
+
+def login_test_user(client):
+    """Helper function to login test user"""
+    response = client.post('/api/login', json={
+        'username': 'testuser_null_safety',
+        'password': 'testpass123'
+    })
+    assert response.status_code == 200, "Login should succeed"
+    return response
+
 def test_analyze_with_none_trade_setup():
     """Test that analyze endpoint handles None trade_setup gracefully"""
     print("Testing analyze endpoint with None trade_setup...")
@@ -16,26 +46,11 @@ def test_analyze_with_none_trade_setup():
     with app.app_context():
         # Ensure database is initialized
         db.create_all()
-        
-        # Create a test user
-        test_user = User.query.filter_by(username='testuser_null_safety').first()
-        if not test_user:
-            test_user = User(
-                username='testuser_null_safety',
-                email='test_null_safety@example.com',
-                full_name='Test User'
-            )
-            test_user.set_password('testpass123')
-            db.session.add(test_user)
-            db.session.commit()
+        setup_test_user()
         
         with app.test_client() as client:
             # Login
-            response = client.post('/api/login', json={
-                'username': 'testuser_null_safety',
-                'password': 'testpass123'
-            })
-            assert response.status_code == 200, "Login should succeed"
+            login_test_user(client)
             
             # Mock the analyze_chart_with_ai function to return a response with None trade_setup
             with patch('app.analyze_chart_with_ai') as mock_analyze:
@@ -81,11 +96,7 @@ def test_analyze_with_missing_trade_setup():
     with app.app_context():
         with app.test_client() as client:
             # Login
-            response = client.post('/api/login', json={
-                'username': 'testuser_null_safety',
-                'password': 'testpass123'
-            })
-            assert response.status_code == 200, "Login should succeed"
+            login_test_user(client)
             
             # Mock the analyze_chart_with_ai function to return a response without trade_setup
             with patch('app.analyze_chart_with_ai') as mock_analyze:
@@ -131,11 +142,7 @@ def test_analyze_with_partial_trade_setup():
     with app.app_context():
         with app.test_client() as client:
             # Login
-            response = client.post('/api/login', json={
-                'username': 'testuser_null_safety',
-                'password': 'testpass123'
-            })
-            assert response.status_code == 200, "Login should succeed"
+            login_test_user(client)
             
             # Mock the analyze_chart_with_ai function to return partial trade_setup
             with patch('app.analyze_chart_with_ai') as mock_analyze:
